@@ -145,10 +145,10 @@ def breadthFirstSearch(problem):
 
             for child in children:
                 # if not already seen
-                if child not in visited:
+                if child[0] not in visited:
                     # add to necessary structures
                     q.push(child)
-                    visited.add(child)
+                    visited.add(child[0])
                     parents[child] = current
 
     # if no path found, throw error
@@ -167,7 +167,7 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
 
     # start = problem.getStartState()
-    # pq =PriorityQueue()
+    # pq = PriorityQueue()
     # visited = set()
     # parents = {}
 
@@ -213,8 +213,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     # use problem.costFn( tuple ) for g cost
 
-    start = problem.getStartState()
-    pq =PriorityQueue()
+    start = [problem.getStartState()]
+    pq = PriorityQueue()
     visited = set()
     parents = {}
 
@@ -222,17 +222,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     current = deepcopy(start)
 
     # not sure about this
-    pq.push(current, heuristic(current, self))
+    pq.push(current, heuristic(current, problem))
 
     while not pq.isEmpty():
         current = pq.pop()
-        if problem.isGoalState(current):
+        if problem.isGoalState(current[0]):
             break
         else:
-            children = problem.getSuccessors(current)
+            children = problem.getSuccessors(current[0])
             for child in children:
                 if child not in visited:
-                    pq.push(child, self.costFn(child[0]) + heuristic(child))
+                    pq.push(child, self.costFn(child[0]) + heuristic(child, problem))
                     visited.add(child)
                     parents[child] = current
 
