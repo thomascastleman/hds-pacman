@@ -90,9 +90,11 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
+
+    # STATE: ( (x, y), direction, cost )
         
-    start = problem.getStartState()
-    stack = Stack()
+    start = [problem.getStartState()]
+    stack = util.Stack()
     visited = set()
     parents = {}
 
@@ -102,24 +104,29 @@ def depthFirstSearch(problem):
 
     while not stack.isEmpty():
         current = stack.pop()
-        if problem.isGoalState(current):
+        if problem.isGoalState(current[0]):
             break
         else:
-            children = problem.getSuccessors(current)
+
+            print "Current state ", current
+            children = problem.getSuccessors(current[0])
             for child in children:
-                if not in visited:
+                if child[0] not in visited:
                     stack.push(child)
-                    visited.add(child)
+                    visited.add(child[0])
                     parents[child] = current
 
-    if not current.isGoalState():
+
+    print "goal: ", problem.goal
+    print "last node ", current
+    if not problem.isGoalState(current[0]):
         util.raiseNotDefined()
 
 
     path = []
 
     while not compareTupleEquality(current, start):
-        path.insert(0,current[1])
+        path.insert(0, current[1])
         current = parents[current]
 
     return path
@@ -142,7 +149,7 @@ def breadthFirstSearch(problem):
         else:
             children = problem.getSuccessors(current)
             for child in children:
-                if not in visited:
+                if child not in visited:
                     q.push(child)
                     visited.add(child)
                     parents[child] = current
@@ -177,7 +184,7 @@ def uniformCostSearch(problem):
     #     else:
     #         children = problem.getSuccessors(current)
     #         for child in children:
-    #             if not in visited:
+    #             if child not in visited:
     #                 pq.push(child)
     #                 visited.add(child)
     #                 parents[child] = current
@@ -226,7 +233,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         else:
             children = problem.getSuccessors(current)
             for child in children:
-                if not in visited:
+                if child not in visited:
                     pq.push(child, self.costFn(child[0]) + heuristic(child))
                     visited.add(child)
                     parents[child] = current
