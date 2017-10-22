@@ -77,41 +77,36 @@ def compareTupleEquality(t1, t2):
     return set(t1) == set(t2)
 
 def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    """
 
     # STATE: ( (x, y), direction, cost )
         
-    start = [problem.getStartState()]
-    stack = util.Stack()
-    visited = set()
-    parents = {}
+    start = [problem.getStartState()]       # get initial state
+    stack = util.Stack()                    # stack for DFS
+    visited = set()                         # set of all (x, y) coords already seen
+    parents = {}                            # dictionary of children to parent
 
-    from copy import deepcopy
-    current = deepcopy(start)
-    stack.push(current)
+    from copy import deepcopy   
+    current = deepcopy(start)       # current node starts at start state
+    stack.push(current)             # add current to stack
 
     while not stack.isEmpty():
+
         current = stack.pop()
+
+        # if at goal state, end
         if problem.isGoalState(current[0]):
             break
         else:
 
             print "Current state ", current
+
+            # get all successor states
             children = problem.getSuccessors(current[0])
             for child in children:
+
+                # if not already explored
                 if child[0] not in visited:
+                    # add to necessary structures
                     stack.push(child)
                     visited.add(child[0])
                     parents[child] = current
@@ -119,12 +114,13 @@ def depthFirstSearch(problem):
 
     print "goal: ", problem.goal
     print "last node ", current
+    # if no path found, throw error
     if not problem.isGoalState(current[0]):
         util.raiseNotDefined()
 
 
+    # backtrack and reconstruct path
     path = []
-
     while not compareTupleEquality(current, start):
         path.insert(0, current[1])
         current = parents[current]
