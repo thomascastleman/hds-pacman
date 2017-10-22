@@ -72,6 +72,10 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+# check if two tuples are equal
+def compareTupleEquality(t1, t2):
+    return set(t1) == set(t2)
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -86,7 +90,40 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
+        
+    start = problem.getStartState()
+    stack = Stack()
+    visited = set()
+    parents = {}
+
+    from copy import deepcopy
+    current = deepcopy(start)
+    stack.push(current)
+
+    while not stack.isEmpty():
+        current = stack.pop()
+        if problem.isGoalState(current):
+            break
+        else:
+            children = problem.getSuccessors(current)
+            for child in children:
+                if not in visited:
+                    stack.push(child)
+                    visited.add(child)
+                    parents[child] = current
+
+    if not current.isGoalState():
+        util.raiseNotDefined()
+
+
+    path = []
+
+    while not compareTupleEquality(current, start):
+        path.insert(0,current[1])
+        current = parents[current]
+
+    return path
+
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
