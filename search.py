@@ -76,6 +76,11 @@ def tinyMazeSearch(problem):
 def checkTupleEquality(t1, t2):
     return set(t1) == set(t2)
 
+# error for no path found
+def throwNoPathError():
+    print "----- ERROR: NO PATH FOUND -----"
+    sys.exit(1)
+
 def depthFirstSearch(problem):
         
     start = [problem.getStartState()]       # get initial state
@@ -109,7 +114,7 @@ def depthFirstSearch(problem):
 
     # if no path found, throw error
     if not problem.isGoalState(current[0]):
-        util.raiseNotDefined()
+        throwNoPathError()
 
 
     # backtrack and reconstruct path
@@ -153,7 +158,7 @@ def breadthFirstSearch(problem):
 
     # if no path found, throw error
     if not problem.isGoalState(current[0]):
-        util.raiseNotDefined()
+        throwNoPathError()
 
 
     # trace back, reconstruct path
@@ -166,40 +171,45 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
 
-    # start = problem.getStartState()
-    # pq = PriorityQueue()
-    # visited = set()
-    # parents = {}
+    start = [problem.getStartState()]       # get start state
+    pq = util.PriorityQueue()               # priority queue for UCS (priority == path cost from start)
+    visited = set()                         # set of all (x, y) coords already visited
+    parents = {}                            # dictionary of children to parent
 
-    # from copy import deepcopy
-    # current = deepcopy(start)
-    # pq.push(current)
+    from copy import deepcopy
+    current = deepcopy(start)       # current = start state
+    pq.push(current, 0)             # add start to pq with cost 0 since 0 away from start
 
-    # while not pq.isEmpty():
-    #     current = pq.pop()
-    #     if problem.isGoalState(current):
-    #         break
-    #     else:
-    #         children = problem.getSuccessors(current)
-    #         for child in children:
-    #             if child not in visited:
-    #                 pq.push(child)
-    #                 visited.add(child)
-    #                 parents[child] = current
+    while not pq.isEmpty():
+        # pop from pq
+        current = pq.pop()
 
-    # if not current.isGoalState():
-    #     util.raiseNotDefined()
+        # if goal state reached, end
+        if problem.isGoalState(current[0]):
+            break
+        else:
+            # get all successors of current state
+            children = problem.getSuccessors(current[0])
 
+            for child in children:
+                # if not already seen
+                if child[0] not in visited:
+                    # add to necessary structures
+                    pq.push(child, problem.costFn(child[0]))
+                    visited.add(child[0])
+                    parents[child] = current
 
-    # path = []
+    # if no path found, throw error
+    if not problem.isGoalState(current[0]):
+        throwNoPathError()
 
-    # while not checkTupleEquality(current, start):
-    #     path.insert(0,current[1])
-    #     current = parents[current]
+    # trace back and reconstruct path 
+    path = []
+    while not checkTupleEquality(current, start):
+        path.insert(0,current[1])
+        current = parents[current]
 
-    # return path
-
-    util.raiseNotDefined()
+    return path
 
 def nullHeuristic(state, problem=None):
     """
@@ -210,34 +220,41 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
 
-    start = [problem.getStartState()]
-    pq = util.PriorityQueue()
-    visited = set()
-    parents = {}
+    start = [problem.getStartState()]       # get start state
+    pq = util.PriorityQueue()               # pq for A* (priority == g(x) + h(x))
+    visited = set()                         # set of (x, y) coords already seen
+    parents = {}                            # dictionary of children to parent
 
     from copy import deepcopy
-    current = deepcopy(start)
+    current = deepcopy(start)      # init current at start state
 
-    pq.push(current, heuristic(current[0], problem))
+    pq.push(current, heuristic(current[0], problem))       # add start to pq with just h(x) priority since g(x) = 0
 
     while not pq.isEmpty():
+        # pop from pq
         current = pq.pop()
+
+        # if at goal state, end
         if problem.isGoalState(current[0]):
             break
         else:
+            # get all successors
             children = problem.getSuccessors(current[0])
+
             for child in children:
+                # if not already seen
                 if child[0] not in visited:
+                    # update necessary structures
                     pq.push(child, problem.costFn(child[0]) + heuristic(child[0], problem))
                     visited.add(child[0])
                     parents[child] = current
 
+    # if no path found, throw error
     if not problem.isGoalState(current[0]):
-        util.raiseNotDefined()
+        throwNoPathError()
 
-
+    # trace back and reconstruct path
     path = []
-
     while not checkTupleEquality(current, start):
         path.insert(0,current[1])
         current = parents[current]
