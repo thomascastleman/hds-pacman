@@ -124,16 +124,76 @@ def depthFirstSearch(problem):
 
     return path
 
-    util.raiseNotDefined()
-
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    start = problem.getStartState()
+    q = Queue()
+    visited = set()
+    parents = {}
+
+    from copy import deepcopy
+    current = deepcopy(start)
+    q.push(current)
+
+    while not q.isEmpty():
+        current = q.pop()
+        if problem.isGoalState(current):
+            break
+        else:
+            children = problem.getSuccessors(current)
+            for child in children:
+                if not in visited:
+                    q.push(child)
+                    visited.add(child)
+                    parents[child] = current
+
+    if not current.isGoalState():
+        util.raiseNotDefined()
+
+
+    path = []
+
+    while not compareTupleEquality(current, start):
+        path.insert(0,current[1])
+        current = parents[current]
+
+    return path
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
+
+    # start = problem.getStartState()
+    # pq =PriorityQueue()
+    # visited = set()
+    # parents = {}
+
+    # from copy import deepcopy
+    # current = deepcopy(start)
+    # pq.push(current)
+
+    # while not pq.isEmpty():
+    #     current = pq.pop()
+    #     if problem.isGoalState(current):
+    #         break
+    #     else:
+    #         children = problem.getSuccessors(current)
+    #         for child in children:
+    #             if not in visited:
+    #                 pq.push(child)
+    #                 visited.add(child)
+    #                 parents[child] = current
+
+    # if not current.isGoalState():
+    #     util.raiseNotDefined()
+
+
+    # path = []
+
+    # while not compareTupleEquality(current, start):
+    #     path.insert(0,current[1])
+    #     current = parents[current]
+
+    # return path
+
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
