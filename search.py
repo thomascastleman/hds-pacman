@@ -210,19 +210,15 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
 
-
-    # use problem.costFn( tuple ) for g cost
-
     start = [problem.getStartState()]
-    pq = PriorityQueue()
+    pq = util.PriorityQueue()
     visited = set()
     parents = {}
 
     from copy import deepcopy
     current = deepcopy(start)
 
-    # not sure about this
-    pq.push(current, heuristic(current, problem))
+    pq.push(current, heuristic(current[0], problem))
 
     while not pq.isEmpty():
         current = pq.pop()
@@ -231,12 +227,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         else:
             children = problem.getSuccessors(current[0])
             for child in children:
-                if child not in visited:
-                    pq.push(child, self.costFn(child[0]) + heuristic(child, problem))
-                    visited.add(child)
+                if child[0] not in visited:
+                    pq.push(child, problem.costFn(child[0]) + heuristic(child[0], problem))
+                    visited.add(child[0])
                     parents[child] = current
 
-    if not current.isGoalState():
+    if not problem.isGoalState(current[0]):
         util.raiseNotDefined()
 
 
