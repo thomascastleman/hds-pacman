@@ -73,12 +73,10 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 # check if two tuples are equal
-def compareTupleEquality(t1, t2):
+def checkTupleEquality(t1, t2):
     return set(t1) == set(t2)
 
 def depthFirstSearch(problem):
-
-    # STATE: ( (x, y), direction, cost )
         
     start = [problem.getStartState()]       # get initial state
     stack = util.Stack()                    # stack for DFS
@@ -98,8 +96,6 @@ def depthFirstSearch(problem):
             break
         else:
 
-            print "Current state ", current
-
             # get all successor states
             children = problem.getSuccessors(current[0])
             for child in children:
@@ -111,9 +107,6 @@ def depthFirstSearch(problem):
                     visited.add(child[0])
                     parents[child] = current
 
-
-    print "goal: ", problem.goal
-    print "last node ", current
     # if no path found, throw error
     if not problem.isGoalState(current[0]):
         util.raiseNotDefined()
@@ -121,7 +114,7 @@ def depthFirstSearch(problem):
 
     # backtrack and reconstruct path
     path = []
-    while not compareTupleEquality(current, start):
+    while not checkTupleEquality(current, start):
         path.insert(0, current[1])
         current = parents[current]
 
@@ -129,34 +122,43 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
 
-    start = problem.getStartState()
-    q = Queue()
-    visited = set()
-    parents = {}
+    start = [problem.getStartState()]       # get start state from problem
+    q = util.Queue()                        # queue for BFS
+    visited = set()                         # set of all (x, y) coords already seen
+    parents = {}                            # dictionary of children to parent
 
     from copy import deepcopy
-    current = deepcopy(start)
-    q.push(current)
+    current = deepcopy(start)       # copy start
+    q.push(current)                 # enqueue
 
     while not q.isEmpty():
+
+        # pop from queue
         current = q.pop()
-        if problem.isGoalState(current):
+
+        # if goal found, end
+        if problem.isGoalState(current[0]):
             break
         else:
-            children = problem.getSuccessors(current)
+            # get all successors
+            children = problem.getSuccessors(current[0])
+
             for child in children:
+                # if not already seen
                 if child not in visited:
+                    # add to necessary structures
                     q.push(child)
                     visited.add(child)
                     parents[child] = current
 
-    if not current.isGoalState():
+    # if no path found, throw error
+    if not problem.isGoalState(current[0]):
         util.raiseNotDefined()
 
 
+    # trace back, reconstruct path
     path = []
-
-    while not compareTupleEquality(current, start):
+    while not checkTupleEquality(current, start):
         path.insert(0,current[1])
         current = parents[current]
 
@@ -191,7 +193,7 @@ def uniformCostSearch(problem):
 
     # path = []
 
-    # while not compareTupleEquality(current, start):
+    # while not checkTupleEquality(current, start):
     #     path.insert(0,current[1])
     #     current = parents[current]
 
@@ -240,7 +242,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     path = []
 
-    while not compareTupleEquality(current, start):
+    while not checkTupleEquality(current, start):
         path.insert(0,current[1])
         current = parents[current]
 
