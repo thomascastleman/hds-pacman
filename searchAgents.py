@@ -346,23 +346,26 @@ def euclidDist(x1, y1, x2, y2):
 
 def cornersHeuristic(state, problem):
     
-    dist = 0 
+    dist = 0                            # total distance to all corners
     copyOfCorners = list(state[1])
     curX, curY = state[0]
 
+    # while corners left to go to
     while len(copyOfCorners) > 0:
         minDist = euclidDist(curX, curY, copyOfCorners[0][0], copyOfCorners[0][1])
         closestCorner = copyOfCorners[0]
 
         for corner in copyOfCorners:
+            # calculate euclidean distance
             d = euclidDist(curX, curY, corner[0], corner[1])
+            # if new min distance, update
             if d < minDist:
                 minDist = d
                 closestCorner = deepcopy(corner)
 
-        dist += d
-        curX, curY = closestCorner
-        copyOfCorners.pop(copyOfCorners.index(closestCorner))
+        dist += minDist                 # add distance to closest corner to total
+        curX, curY = closestCorner      # move current position to that corner
+        copyOfCorners.pop(copyOfCorners.index(closestCorner))   # remove that corner from remaining
 
     return dist
 
