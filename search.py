@@ -81,136 +81,6 @@ def throwNoPathError():
     print "----- ERROR: NO PATH FOUND -----"
     sys.exit(1)
 
-def depthFirstSearch(problem):
-        
-    start = [problem.getStartState()]       # get initial state
-    stack = util.Stack()                    # stack for DFS
-    visited = set()                         # set of all (x, y) coords already seen
-    parents = {}                            # dictionary of children to parent
-
-    from copy import deepcopy   
-    current = deepcopy(start)       # current node starts at start state
-    stack.push(current)             # add current to stack
-
-    while not stack.isEmpty():
-
-        current = stack.pop()
-
-        # if at goal state, end
-        if problem.isGoalState(current[0]):
-            break
-        else:
-
-            # get all successor states
-            children = problem.getSuccessors(current[0])
-            for child in children:
-
-                # if not already explored
-                if child[0] not in visited:
-                    # add to necessary structures
-                    stack.push(child)
-                    visited.add(child[0])
-                    parents[child] = current
-
-    # if no path found, throw error
-    if not problem.isGoalState(current[0]):
-        throwNoPathError()
-
-
-    # backtrack and reconstruct path
-    path = []
-    while not checkTupleEquality(current, start):
-        path.insert(0, current[1])
-        current = parents[current]
-
-    return path
-
-def breadthFirstSearch(problem):
-
-    start = [problem.getStartState()]       # get start state from problem
-    q = util.Queue()                        # queue for BFS
-    visited = set()                         # set of all (x, y) coords already seen
-    parents = {}                            # dictionary of children to parent
-
-    from copy import deepcopy
-    current = deepcopy(start)       # copy start
-    q.push(current)                 # enqueue
-
-    while not q.isEmpty():
-
-        # pop from queue
-        current = q.pop()
-
-        # if goal found, end
-        if problem.isGoalState(current[0]):
-            break
-        else:
-            # get all successors
-            children = problem.getSuccessors(current[0])
-
-            for child in children:
-                # if not already seen
-                if child[0] not in visited:
-                    # add to necessary structures
-                    q.push(child)
-                    visited.add(child[0])
-                    parents[child] = current
-
-    # if no path found, throw error
-    if not problem.isGoalState(current[0]):
-        throwNoPathError()
-
-
-    # trace back, reconstruct path
-    path = []
-    while not checkTupleEquality(current, start):
-        path.insert(0,current[1])
-        current = parents[current]
-
-    return path
-
-def uniformCostSearch(problem):
-
-    start = [problem.getStartState()]       # get start state
-    pq = util.PriorityQueue()               # priority queue for UCS (priority == path cost from start)
-    visited = set()                         # set of all (x, y) coords already visited
-    parents = {}                            # dictionary of children to parent
-
-    from copy import deepcopy
-    current = deepcopy(start)       # current = start state
-    pq.push(current, 0)             # add start to pq with cost 0 since 0 away from start
-
-    while not pq.isEmpty():
-        # pop from pq
-        current = pq.pop()
-
-        # if goal state reached, end
-        if problem.isGoalState(current[0]):
-            break
-        else:
-            # get all successors of current state
-            children = problem.getSuccessors(current[0])
-
-            for child in children:
-                # if not already seen
-                if child[0] not in visited:
-                    # add to necessary structures
-                    pq.push(child, problem.costFn(child[0]))
-                    visited.add(child[0])
-                    parents[child] = current
-
-    # if no path found, throw error
-    if not problem.isGoalState(current[0]):
-        throwNoPathError()
-
-    # trace back and reconstruct path 
-    path = []
-    while not checkTupleEquality(current, start):
-        path.insert(0,current[1])
-        current = parents[current]
-
-    return path
-
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -218,50 +88,70 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
-def aStarSearch(problem, heuristic=nullHeuristic):
+def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
+    start = [problem.getStartState()]   # get start state
+    struct = dataStruct                 # get generic data structure
 
-    start = [problem.getStartState()]       # get start state
-    pq = util.PriorityQueue()               # pq for A* (priority == g(x) + h(x))
-    visited = set()                         # set of (x, y) coords already seen
-    parents = {}                            # dictionary of children to parent
+    visited = set()                     # set of all coords already seen
+    parents = {}                        # dictionary mapping child states to their parents
 
     from copy import deepcopy
-    current = deepcopy(start)      # init current at start state
+    current = deepcopy(start)       # set current node to root node
 
-    pq.push(current, heuristic(current[0], problem))       # add start to pq with just h(x) priority since g(x) = 0
+    # add root node to generic data structure
+    if usesPQ:
+        struct.push(current, heuristic(current[0], problem))
+    else:
+        struct.push(current)
 
-    while not pq.isEmpty():
-        # pop from pq
-        current = pq.pop()
+    # while data structure not empty
+    while not struct.isEmpty():
+        current = struct.pop()  # pop from struct
 
-        # if at goal state, end
+        # if at goal, end
         if problem.isGoalState(current[0]):
             break
         else:
-            # get all successors
+            # get child states from problem
             children = problem.getSuccessors(current[0])
 
+            # for each child state
             for child in children:
                 # if not already seen
                 if child[0] not in visited:
-                    # update necessary structures
-                    pq.push(child, problem.costFn(child[0]) + heuristic(child[0], problem))
+                    # add to data structure
+                    if usesPQ:
+                        struct.push(child, heuristic(child[0], problem) + problem.costFn(child[0]))
+                    else:
+                        struct.push(child)
+
+                    # add to visited and update in parents
                     visited.add(child[0])
                     parents[child] = current
 
-    # if no path found, throw error
+    # if didn't find goa, throw error
     if not problem.isGoalState(current[0]):
         throwNoPathError()
 
     # trace back and reconstruct path
     path = []
     while not checkTupleEquality(current, start):
-        path.insert(0,current[1])
+        path.insert(0, current[1])
         current = parents[current]
 
     return path
 
+def depthFirstSearch(problem):
+    return genericSearch(problem, util.Stack(), False)
 
+def breadthFirstSearch(problem):
+    return genericSearch(problem, util.Queue(), False)
+
+def uniformCostSearch(problem):
+    return genericSearch(problem, util.PriorityQueue(), True)
+
+def aStarSearch(problem, heuristic=nullHeuristic):
+    return genericSearch(problem, util.PriorityQueue(), True, heuristic)
 
 # Abbreviations
 bfs = breadthFirstSearch
