@@ -425,6 +425,9 @@ class FoodSearchProblem:
             cost += 1
         return cost
 
+    def costFn(self, state):
+        return 0
+
 class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
