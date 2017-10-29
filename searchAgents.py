@@ -277,6 +277,9 @@ class CornersProblem(search.SearchProblem):
     You must select a suitable state space and successor function
     """
 
+    def costFn(self, state):
+        return 0
+
     def __init__(self, startingGameState):
         """
         Stores the walls, pacman's starting position and corners.
@@ -362,10 +365,6 @@ def cornersHeuristic(state, problem):
         copyOfCorners.pop(copyOfCorners.index(closestCorner))
 
     return dist
-
-
-
-
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
