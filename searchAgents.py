@@ -41,6 +41,10 @@ import util
 import time
 import search
 
+# our imports:
+from copy import deepcopy
+import math
+
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
 
@@ -296,8 +300,6 @@ class CornersProblem(search.SearchProblem):
 
     def getSuccessors(self, state):
 
-        from copy import deepcopy
-
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
 
@@ -336,25 +338,34 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
+def euclidDist(x1, y1, x2, y2):
+    return math.sqrt( ((x1 - x2) ** 2) + ((y1 - y2) ** 2) )
 
 def cornersHeuristic(state, problem):
-    """
-    A heuristic for the CornersProblem that you defined.
+    
+    dist = 0 
+    copyOfCorners = list(state[1])
+    curX, curY = state[0]
 
-      state:   The current search state
-               (a data structure you chose in your search problem)
+    while len(copyOfCorners) > 0:
+        minDist = euclidDist(curX, curY, copyOfCorners[0][0], copyOfCorners[0][1])
+        closestCorner = copyOfCorners[0]
 
-      problem: The CornersProblem instance for this layout.
+        for corner in copyOfCorners:
+            d = euclidDist(curX, curY, corner[0], corner[1])
+            if d < minDist:
+                minDist = d
+                closestCorner = deepcopy(corner)
 
-    This function should always return a number that is a lower bound on the
-    shortest path from the state to a goal of the problem; i.e.  it should be
-    admissible (as well as consistent).
-    """
-    corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+        dist += d
+        curX, curY = closestCorner
+        copyOfCorners.pop(copyOfCorners.index(closestCorner))
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    return dist
+
+
+
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
