@@ -95,6 +95,9 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
     visited = set()                     # set of all coords already seen
     parents = {}                        # dictionary mapping child states to their parents
 
+    pathToState = {}                    # dictionary mapping coords to the total list of directions taken to get to that coord
+    pathToState[start[0]] = []          # initialize with start state, and no actions taken
+
     from copy import deepcopy
     current = deepcopy(start)       # set current node to root node
 
@@ -119,9 +122,13 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
             for child in children:
                 # if not already seen
                 if child[0] not in visited:
+
+                    pathToState[child[0]] = pathToState[current[0]] + [child[1]] # add path of parent plus direction taken to get  to child 
+
                     # add to data structure
                     if usesPQ:
-                        struct.push(child, heuristic(child[0], problem) + problem.costFn(child[0]))
+                        # struct.push(child, heuristic(child[0], problem) + problem.costFn(child[0]))
+                        struct.push(child, heuristic(child[0], problem) + problem.getCostOfActions(pathToState[child[0]]))
                     else:
                         struct.push(child)
 
