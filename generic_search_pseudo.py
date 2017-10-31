@@ -39,12 +39,3 @@ def generic_search(problem, dataStruct, heuristic=None, usesPQ, costFunction):
     # return path
 
     pass
-
-
-def UCS_Cost(problem, position, heuristic=None):
-	return problem.costFn(position)
-
-
-
-def aStarCost(problem, position, heuristic=nullHeuristic):
-	return UCS_Cost(problem, position) + heuristic(position, problem)

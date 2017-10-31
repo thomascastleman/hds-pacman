@@ -88,6 +88,15 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+# given a state and the dictionary of states to parents, trace back the path of actions that led to this state
+def getPathFromStart(current, parentsDictionary):
+    currentState = current
+    actions = []
+    while currentState[1] != 'Stop':
+        actions.insert(0, currentState[1])
+        currentState = parentsDictionary[currentState]
+    return actions
+
 def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
     start = [problem.getStartState()]   # get start state
     struct = dataStruct                 # get generic data structure
@@ -95,13 +104,7 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
     visited = set()                     # set of all coords already seen
     parents = {}                        # dictionary mapping child states to their parents
 
-    pathToState = {}                    # dictionary mapping coords to the total list of directions taken to get to that coord
-    pathToState[start[0]] = []          # initialize with start state, and no actions taken
-
-    print "START: ", start
-
-    from copy import deepcopy
-    current = deepcopy(start)       # set current node to root node
+    current = tuple([start[0], 'Stop', 0]) # set current node to root node
 
     # add root node to generic data structure
     if usesPQ:
@@ -122,20 +125,18 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
 
             # for each child state
             for child in children:
+
                 # if not already seen
                 if child[0] not in visited:
-
-                    pathToState[child[0]] = pathToState[current[0]] + [child[1]] # add path of parent plus direction taken to get  to child 
-
-                    # add to data structure
-                    if usesPQ:
-                        struct.push(child, heuristic(child[0], problem) + problem.getCostOfActions(pathToState[child[0]]))
-                    else:
-                        struct.push(child)
-
                     # add to visited and update in parents
                     visited.add(child[0])
                     parents[child] = current
+
+                    # add to data structure
+                    if usesPQ:
+                        struct.push(child, heuristic(child[0], problem) + problem.getCostOfActions(getPathFromStart(child, parents)))
+                    else:
+                        struct.push(child)
 
     # if didn't find goal, throw error
     if not problem.isGoalState(current[0]):
@@ -143,7 +144,7 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
 
     # trace back and reconstruct path
     path = []
-    while not checkTupleEquality(current, start):
+    while not checkTupleEquality(current[0], start[0]):
         path.insert(0, current[1])
         current = parents[current]
 
