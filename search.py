@@ -98,6 +98,8 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
     pathToState = {}                    # dictionary mapping coords to the total list of directions taken to get to that coord
     pathToState[start[0]] = []          # initialize with start state, and no actions taken
 
+    print "START: ", start
+
     from copy import deepcopy
     current = deepcopy(start)       # set current node to root node
 
@@ -127,7 +129,6 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
 
                     # add to data structure
                     if usesPQ:
-                        # struct.push(child, heuristic(child[0], problem) + problem.costFn(child[0]))
                         struct.push(child, heuristic(child[0], problem) + problem.getCostOfActions(pathToState[child[0]]))
                     else:
                         struct.push(child)
@@ -136,7 +137,7 @@ def genericSearch(problem, dataStruct, usesPQ, heuristic=nullHeuristic):
                     visited.add(child[0])
                     parents[child] = current
 
-    # if didn't find goa, throw error
+    # if didn't find goal, throw error
     if not problem.isGoalState(current[0]):
         throwNoPathError()
 

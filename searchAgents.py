@@ -344,6 +344,9 @@ class CornersProblem(search.SearchProblem):
 def euclidDist(x1, y1, x2, y2):
     return math.sqrt( ((x1 - x2) ** 2) + ((y1 - y2) ** 2) )
 
+def manHatDist(x1, y1, x2, y2):
+    return abs(x1 - x2) + abs(y1 - y2)
+
 def cornersHeuristic(state, problem):
     
     dist = 0                            # total distance to all corners
@@ -353,6 +356,7 @@ def cornersHeuristic(state, problem):
     # while corners left to go to
     while len(copyOfCorners) > 0:
         minDist = euclidDist(curX, curY, copyOfCorners[0][0], copyOfCorners[0][1])
+        
         closestCorner = copyOfCorners[0]
 
         for corner in copyOfCorners:

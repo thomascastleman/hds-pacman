@@ -22,3 +22,4 @@ util.py
 /layouts/*
 /test_cases/*
 desktop.ini
+*.pyc
